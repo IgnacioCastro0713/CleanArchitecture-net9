@@ -1,0 +1,34 @@
+services:
+  web-api:
+    image: ${DOCKER_REGISTRY-}webapi
+    container_name: web-api
+    build:
+      context: .
+      dockerfile: src/Web.Api/Dockerfile
+    ports:
+      - 5000:8080 # http
+      - 5001:8081 # https
+    depends_on:
+      - sql-server
+
+  sql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql-server
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Passw0rd123
+    ports:
+      - 1433:1433
+    volumes:
+      - sql-data:/var/opt/mssql
+
+  seq:
+    image: datalust/seq:2024.3
+    container_name: seq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - 8081:80
+
+volumes:
+  sql-data:
