@@ -102,16 +102,11 @@ public static class DependencyInjection
 
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        services.Scan(scan =>
-        {
-            IImplementationTypeSelector s = scan.FromAssembliesOf(typeof(DependencyInjection))
-                .AddClasses(classes => classes.AssignableTo(typeof(Repository<>)), publicOnly: false)
-                .UsingRegistrationStrategy(RegistrationStrategy.Skip)
-                .AsMatchingInterface()
-                .WithScopedLifetime();
-            Console.WriteLine(s);
-
-        });
+        services.Scan(scan => scan.FromAssembliesOf(typeof(DependencyInjection))
+            .AddClasses(classes => classes.AssignableTo(typeof(Repository<>)), publicOnly: false)
+            .UsingRegistrationStrategy(RegistrationStrategy.Skip)
+            .AsMatchingInterface()
+            .WithScopedLifetime());
 
         return services;
     }
