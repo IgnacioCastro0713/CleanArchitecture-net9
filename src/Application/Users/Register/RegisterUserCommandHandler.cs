@@ -2,21 +2,19 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Domain.Users;
+using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
 namespace Application.Users.Register;
 
 internal sealed class RegisterUserCommandHandler(
-    IUserRepository userRepository,
-    IUnitOfWork unitOfWork,
+    IApplicationDbContext context,
     IPasswordHasher passwordHasher)
     : ICommandHandler<RegisterUserCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
     {
-        User? existingUser = await userRepository.GetByEmailAsync(command.Email, cancellationToken);
-
-        if (existingUser is not null)
+        if (await context.Users.AnyAsync(u => u.Email == command.Email, cancellationToken))
         {
             return Result.Failure<Guid>(UserErrors.EmailNotUnique);
         }
@@ -28,9 +26,9 @@ internal sealed class RegisterUserCommandHandler(
             passwordHasher.Hash(command.Password)
         );
 
-        userRepository.Add(user);
+        context.Users.Add(user);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
 
         return user.Id;
     }

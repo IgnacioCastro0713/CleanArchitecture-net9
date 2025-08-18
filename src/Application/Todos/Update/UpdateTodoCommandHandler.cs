@@ -1,18 +1,19 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Domain.Todos;
+using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
 namespace Application.Todos.Update;
 
 internal sealed class UpdateTodoCommandHandler(
-    ITodoRepository todoRepository,
-    IUnitOfWork unitOfWork)
+    IApplicationDbContext context)
     : ICommandHandler<UpdateTodoCommand>
 {
     public async Task<Result> Handle(UpdateTodoCommand command, CancellationToken cancellationToken)
     {
-        TodoItem? todoItem = await todoRepository.GetByIdAsync(command.TodoItemId, cancellationToken);
+        TodoItem? todoItem = await context.TodoItems
+            .SingleOrDefaultAsync(t => t.Id == command.TodoItemId, cancellationToken);
 
         if (todoItem is null)
         {
@@ -21,7 +22,7 @@ internal sealed class UpdateTodoCommandHandler(
 
         todoItem.Description = command.Description;
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

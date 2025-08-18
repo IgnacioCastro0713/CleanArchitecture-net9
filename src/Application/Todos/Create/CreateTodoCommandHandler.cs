@@ -3,16 +3,15 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Domain.Todos;
 using Domain.Users;
+using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
 namespace Application.Todos.Create;
 
 internal sealed class CreateTodoCommandHandler(
-    IUserRepository userRepository,
-    ITodoRepository todoRepository,
+    IApplicationDbContext context,
     TimeProvider timeProvider,
-    IUserContext userContext,
-    IUnitOfWork unitOfWork)
+    IUserContext userContext)
     : ICommandHandler<CreateTodoCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(CreateTodoCommand command, CancellationToken cancellationToken)
@@ -22,7 +21,9 @@ internal sealed class CreateTodoCommandHandler(
             return Result.Failure<Guid>(UserErrors.Unauthorized());
         }
 
-        User? user = await userRepository.GetByIdAsync(command.UserId, cancellationToken);
+        User? user = await context.Users
+            .AsNoTracking()
+            .SingleOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
 
         if (user is null)
         {
@@ -38,9 +39,9 @@ internal sealed class CreateTodoCommandHandler(
             timeProvider.GetUtcNow().UtcDateTime
         );
 
-        todoRepository.Add(todoItem);
+        context.TodoItems.Add(todoItem);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
 
         return todoItem.Id;
     }

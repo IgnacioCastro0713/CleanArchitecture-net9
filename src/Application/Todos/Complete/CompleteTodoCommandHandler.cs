@@ -2,23 +2,21 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Domain.Todos;
+using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
 namespace Application.Todos.Complete;
 
 internal sealed class CompleteTodoCommandHandler(
-    ITodoRepository todoRepository,
+    IApplicationDbContext context,
     TimeProvider timeProvider,
-    IUserContext userContext,
-    IUnitOfWork unitOfWork)
+    IUserContext userContext)
     : ICommandHandler<CompleteTodoCommand>
 {
     public async Task<Result> Handle(CompleteTodoCommand command, CancellationToken cancellationToken)
     {
-        TodoItem? todoItem = await todoRepository.GetAssignedByIdAsync(
-            command.TodoItemId,
-            userContext.UserId,
-            cancellationToken);
+        TodoItem? todoItem = await context.TodoItems
+            .SingleOrDefaultAsync(t => t.Id == command.TodoItemId && t.UserId == userContext.UserId, cancellationToken);
 
         if (todoItem is null)
         {
@@ -32,7 +30,7 @@ internal sealed class CompleteTodoCommandHandler(
 
         todoItem.Complete(timeProvider.GetUtcNow().UtcDateTime);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

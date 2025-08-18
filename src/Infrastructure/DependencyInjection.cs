@@ -8,11 +8,11 @@ using Infrastructure.DomainEvents;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Scrutor;
 
 namespace Infrastructure;
 
@@ -20,14 +20,15 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        IConfiguration configuration) =>
-        services
+        IConfiguration configuration)
+    {
+        return services
             .AddServices()
             .AddDatabase(configuration)
             .AddHealthChecks(configuration)
             .AddAuthenticationInternal(configuration)
-            .AddAuthorizationInternal()
-            .AddRepositories();
+            .AddAuthorizationInternal();
+    }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
@@ -40,15 +41,19 @@ public static class DependencyInjection
     {
         string? connectionString = configuration.GetConnectionString("Database");
 
-        services.AddDbContext<ApplicationDbContext>(options => options
-            .UseSqlServer(connectionString, optionsBuilder =>
-                optionsBuilder.MigrationsHistoryTable(HistoryRepository.DefaultTableName)));
+        services.Scan(scan => scan.FromAssembliesOf(typeof(DependencyInjection))
+            .AddClasses(classes => classes.AssignableTo<ISaveChangesInterceptor>(), publicOnly: false)
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
 
-        services.AddScoped<IApplicationDbContext>(sp =>
-            sp.GetRequiredService<ApplicationDbContext>());
+        services.AddDbContext<ApplicationDbContext>((sp, options) =>
+        {
+            options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
+            options.UseSqlServer(connectionString, sqlBuilder
+                => sqlBuilder.MigrationsHistoryTable(HistoryRepository.DefaultTableName));
+        });
 
-        services.AddScoped<IUnitOfWork>(sp =>
-            sp.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 
         return services;
     }
@@ -96,17 +101,6 @@ public static class DependencyInjection
         services.AddTransient<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
         services.AddTransient<IAuthorizationPolicyProvider, PermissionAuthorizationPolicyProvider>();
-
-        return services;
-    }
-
-    private static IServiceCollection AddRepositories(this IServiceCollection services)
-    {
-        services.Scan(scan => scan.FromAssembliesOf(typeof(DependencyInjection))
-            .AddClasses(classes => classes.AssignableTo(typeof(Repository<>)), publicOnly: false)
-            .UsingRegistrationStrategy(RegistrationStrategy.Skip)
-            .AsMatchingInterface()
-            .WithScopedLifetime());
 
         return services;
     }
