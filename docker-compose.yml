@@ -13,7 +13,7 @@ services:
     depends_on:
       - sql-server
     networks:
-      - api-net
+      - app-net
 
   sql-server:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -26,18 +26,18 @@ services:
     volumes:
       - sql-data:/var/opt/mssql
     networks:
-      - api-net
+      - app-net
 
-  dashboard:
+  aspire-dashboard:
     image: mcr.microsoft.com/dotnet/nightly/aspire-dashboard:latest
-    container_name: dashboard
+    container_name: aspire-dashboard
     ports:
      - 18888:18888
     networks:
-      - api-net
+      - app-net
 
 volumes:
   sql-data:
   
 networks:
-  api-net:
+  app-net:
