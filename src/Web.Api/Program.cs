@@ -2,10 +2,6 @@ using Application;
 using HealthChecks.UI.Client;
 using Infrastructure;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-//using OpenTelemetry.Logs;
-//using OpenTelemetry.Metrics;
-//using OpenTelemetry.Resources;
-//using OpenTelemetry.Trace;
 using Web.Api;
 using Web.Api.Extensions;
 
@@ -21,28 +17,6 @@ builder.Services
     .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddEndpoints(typeof(Program).Assembly);
-
-//builder.Services
-//    .AddOpenTelemetry()
-//    .ConfigureResource(resource => resource.AddService("web-api"))
-//    .WithMetrics(metrics =>
-//    {
-//        metrics
-//            .AddHttpClientInstrumentation()
-//            .AddAspNetCoreInstrumentation();
-
-//        metrics.AddOtlpExporter();
-//    })
-//    .WithTracing(tracing =>
-//    {
-//        tracing
-//            .AddHttpClientInstrumentation()
-//            .AddAspNetCoreInstrumentation()
-//            .AddEntityFrameworkCoreInstrumentation(opt => opt.SetDbStatementForText = true);
-
-//        tracing.AddOtlpExporter();
-//    });
-//builder.Logging.AddOpenTelemetry(logging => logging.AddOtlpExporter());
 
 WebApplication app = builder.Build();
 
