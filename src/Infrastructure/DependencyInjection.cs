@@ -60,9 +60,11 @@ public static class DependencyInjection
 
     private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
     {
+        string? connectionString = configuration.GetConnectionString("Database");
+
         services
             .AddHealthChecks()
-            .AddSqlServer(configuration.GetConnectionString("Database")!);
+            .AddSqlServer(connectionString!);
 
         return services;
     }
