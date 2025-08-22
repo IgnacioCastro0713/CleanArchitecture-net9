@@ -16,6 +16,7 @@ builder.Services
     .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddEndpoints(typeof(Program).Assembly);
+builder.Services.AddCorsDefaultPolicy();
 
 builder.Services.AddOpenTelemetry(builder.Configuration, serviceName: "web-api");
 builder.Logging.AddOpenTelemetry(logging => logging.AddOtlpExporter());
@@ -45,6 +46,8 @@ app.UseExceptionHandler();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseCors();
 
 await app.RunAsync();
 

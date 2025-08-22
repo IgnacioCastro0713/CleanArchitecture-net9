@@ -49,8 +49,11 @@ public static class DependencyInjection
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseSqlServer(connectionString, sqlBuilder
-                => sqlBuilder.MigrationsHistoryTable(HistoryRepository.DefaultTableName));
+            options.UseMySql(
+                    connectionString,
+                    ServerVersion.AutoDetect(connectionString),
+                    sqlBuilder => sqlBuilder.MigrationsHistoryTable(HistoryRepository.DefaultTableName))
+                .UseSnakeCaseNamingConvention();
         });
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
@@ -64,7 +67,7 @@ public static class DependencyInjection
 
         services
             .AddHealthChecks()
-            .AddSqlServer(connectionString!);
+            .AddMySql(connectionString!);
 
         return services;
     }

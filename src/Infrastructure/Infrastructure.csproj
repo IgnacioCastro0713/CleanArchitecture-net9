@@ -1,12 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.MySql" />
     <PackageReference Include="AspNetCore.HealthChecks.SqlServer" />
     <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />
     <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,6 +17,10 @@
 
   <ItemGroup>
 	<InternalsVisibleTo Include="ArchitectureTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Database\Migrations\" />
   </ItemGroup>
 
 </Project>
