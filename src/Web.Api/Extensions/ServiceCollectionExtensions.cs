@@ -54,14 +54,14 @@ internal static class ServiceCollectionExtensions
         IConfiguration configuration,
         string serviceName)
     {
-        string? connectionString =
-            configuration["ApplicationInsights:ConnectionString"];
-
         OpenTelemetryBuilder openTelemetryBuilder = services
             .AddOpenTelemetry()
             .ConfigureResource(r => r.AddService(
                 serviceName: serviceName,
                 serviceInstanceId: Environment.MachineName));
+
+        string? connectionString = configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"] ??
+                                   configuration["ApplicationInsights:ConnectionString"];
 
         if (!string.IsNullOrWhiteSpace(connectionString))
         {
