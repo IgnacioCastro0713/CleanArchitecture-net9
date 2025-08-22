@@ -1,5 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Azure.Monitor.OpenTelemetry.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 namespace Web.Api.Extensions;
 
@@ -39,6 +44,47 @@ internal static class ServiceCollectionExtensions
             };
 
             o.AddSecurityRequirement(securityRequirement);
+        });
+
+        return services;
+    }
+
+    public static IServiceCollection AddOpenTelemetry(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        string serviceName)
+    {
+        string? connectionString =
+            configuration["ApplicationInsights:ConnectionString"];
+
+        OpenTelemetryBuilder openTelemetryBuilder = services
+            .AddOpenTelemetry()
+            .ConfigureResource(r => r.AddService(
+                serviceName: serviceName,
+                serviceInstanceId: Environment.MachineName));
+
+        if (!string.IsNullOrWhiteSpace(connectionString))
+        {
+            openTelemetryBuilder.UseAzureMonitor(options => options.ConnectionString = connectionString);
+        }
+
+        openTelemetryBuilder.WithMetrics(metrics =>
+        {
+            metrics
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation();
+
+            metrics.AddOtlpExporter();
+        });
+
+        openTelemetryBuilder.WithTracing(tracing =>
+        {
+            tracing
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddEntityFrameworkCoreInstrumentation(opt => opt.SetDbStatementForText = true);
+
+            tracing.AddOtlpExporter();
         });
 
         return services;

@@ -11,20 +11,7 @@ services:
       - 5000:8080 # http
       - 5001:8081 # https
     depends_on:
-      - sql-server
-    networks:
-      - app-net
-
-  sql-server:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sql-server
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=YourStrong!Passw0rd123
-    ports:
-      - 1433:1433
-    volumes:
-      - sql-data:/var/opt/mssql
+      - aspire-dashboard
     networks:
       - app-net
 
@@ -35,9 +22,6 @@ services:
      - 18888:18888
     networks:
       - app-net
-
-volumes:
-  sql-data:
   
 networks:
   app-net:

@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Api.Infrastructure;
 
-internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
+internal sealed class GlobalExceptionHandler(
+    ILogger<GlobalExceptionHandler> logger)
     : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
