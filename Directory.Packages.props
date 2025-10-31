@@ -5,7 +5,7 @@
 	<!--.NET 9 packages. Most of them will work on .NET 8. If you need to, make the updates here individually.-->
 	<ItemGroup>
 		<!-- Static code analysis -->
-		<PackageVersion Include="SonarAnalyzer.CSharp" Version="10.12.0.118525" />
+		<PackageVersion Include="SonarAnalyzer.CSharp" Version="10.15.0.120848" />
 		<!-- Application -->
 		<PackageVersion Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.3.0" />
 		<PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.12.0" />
