@@ -39,7 +39,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        string? connectionString = configuration.GetConnectionString("clean-architecture-db");
+        string? connectionString = configuration.GetConnectionString("Database");
 
         services.Scan(scan => scan.FromAssembliesOf(typeof(DependencyInjection))
             .AddClasses(classes => classes.AssignableTo<ISaveChangesInterceptor>(), publicOnly: false)
@@ -62,7 +62,7 @@ public static class DependencyInjection
     {
         services
             .AddHealthChecks()
-            .AddSqlServer(configuration.GetConnectionString("clean-architecture-db")!);
+            .AddSqlServer(configuration.GetConnectionString("Database")!);
 
         return services;
     }

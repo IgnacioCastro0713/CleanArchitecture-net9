@@ -3,8 +3,10 @@
     "Docker Compose": {
       "commandName": "DockerCompose",
       "commandVersion": "1.0",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://localhost:{ServicePort}/swagger",
       "serviceActions": {
-        "web.api": "StartDebugging"
+        "web-api": "StartDebugging"
       }
     }
   }
