@@ -62,6 +62,21 @@ This template includes **.NET Aspire** for streamlined local development, orches
    ```
    *Aspire will automatically provision an Azure SQL Edge container, inject the connection string into the `Web.Api` project, and start the Aspire Dashboard for telemetry (Logs, Traces, Metrics).*
 
+### Run Locally (with Docker Compose)
+
+The template includes a `docker-compose.yml` file to quickly spin up the entire environment (API, SQL Server, and Dashboard) without needing to install SQL Server locally.
+
+1. Ensure Docker Desktop or Podman is running.
+2. Run the following command from the root directory:
+   ```bash
+   docker-compose up -d
+   ```
+3. Once the containers are healthy:
+   - **API (Swagger):** [http://localhost:5000/swagger](http://localhost:5000/swagger)
+   - **Aspire Dashboard:** [http://localhost:18888](http://localhost:18888)
+
+*Note: The `docker-compose.yml` is pre-configured with the necessary environment variables (`ConnectionStrings__Database`) to connect the API with the SQL Server container automatically.*
+
 ## 🧪 Testing
 
 The solution includes an `ArchitectureTests` project to maintain architectural integrity. Run the tests via:
