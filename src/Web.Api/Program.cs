@@ -2,11 +2,15 @@ using Application;
 using HealthChecks.UI.Client;
 using Infrastructure;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Web.Api;
 using Web.Api.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 
 builder.Services.AddSwaggerGenWithAuth();
 
@@ -17,10 +21,9 @@ builder.Services
 
 builder.Services.AddEndpoints(typeof(Program).Assembly);
 
-builder.Services.AddOpenTelemetry(builder.Configuration, serviceName: "web-api");
-builder.Logging.AddOpenTelemetry(logging => logging.AddOtlpExporter());
-
 WebApplication app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 RouteGroupBuilder groupBuilder = app.MapGroup("api");
 

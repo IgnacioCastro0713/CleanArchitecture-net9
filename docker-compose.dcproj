@@ -6,7 +6,7 @@
     <ProjectGuid>34bb3069-d5d0-4046-acad-a2025ed7678f</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
-    <DockerServiceName>web.api</DockerServiceName>
+    <DockerServiceName>web-api</DockerServiceName>
     <DockerComposeProjectName>clean-architecture</DockerComposeProjectName>
   </PropertyGroup>
   <ItemGroup>

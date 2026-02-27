@@ -7,6 +7,7 @@ services:
       dockerfile: src/Web.Api/Dockerfile
     environment: 
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18889
+      - ConnectionStrings__Database=Server=sql-server;Database=clean-architecture;User Id=sa;Password=YourStrong!Passw0rd123;TrustServerCertificate=True
     ports:
       - 5000:8080 # http
       - 5001:8081 # https
